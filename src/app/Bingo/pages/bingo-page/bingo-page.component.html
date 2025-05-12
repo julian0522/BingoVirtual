@@ -1,0 +1,43 @@
+
+<section class="fixed bottom-0 top-0 w-full gap-8 bg-[url('/imagenes/Imagen_Bingo.webp')] bg-cover bg-center">
+
+  <!-- Overlay semi-transparente -->
+  <div class="absolute inset-0 bg-black opacity-75"></div>
+
+  <div class="relative grid-cols-1 max-w-screen-2xl mx-20 xl:mx-auto  mt-10 mb-10">
+    <div class="">
+      <h2 class="text-2xl mb-4 ">Modo de Juego Actual</h2>
+      <img [src]="`imagenes/${modoJuego()}.jpg`" alt="Imagen Modo De Juego Bingo" class="h-40 w-40 xl:h-50 xl:w-50">
+    </div>
+  </div>
+
+  <div class="relative bingo-container max-w-screen-2xl mx-auto">
+
+    <!-- Columna con el texto BINGO -->
+    <div class="bingo-line flex justify-center gap-4 mb-4">
+      <span class="text-yellow-400 md:text-6xl font-bold my-2">B</span>
+      <span class="text-yellow-400 md:text-6xl font-bold my-2">I</span>
+      <span class="text-yellow-400 md:text-6xl font-bold my-2">N</span>
+      <span class="text-yellow-400 md:text-6xl font-bold my-2">G</span>
+      <span class="text-yellow-400 md:text-6xl font-bold my-2">O</span>
+    </div>
+
+    <!-- Grilla de números del bingo -->
+    <div class="bingo-grid grid grid-cols-5 sm:grid-cols-10 md:grid-cols-15 gap-2 sm:gap-4">
+      @for (numero of numerosBingo; track numero) {
+        <div
+          class="mb-4 bingo-item aspect-square flex items-center justify-center text-lg sm:text-xl md:text-4xl font-semibold rounded-md transition-all"
+          [ngClass]="{
+            'bg-red-600 text-white fade-bg': bingoService.numerosBingo().includes(numero),
+            'bg-white text-black border': !bingoService.numerosBingo().includes(numero)
+          }"
+        >
+          {{ numero }}
+        </div>
+      }
+    </div>
+
+  </div>
+</section>
+
+

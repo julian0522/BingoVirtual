@@ -1,1 +1,66 @@
 /* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+}
+
+
+.bingo-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+.bingo-line {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.letter {
+  font-size: 30px;
+  font-weight: bold;
+  color: #333;
+  margin: 10px 0;
+}
+
+.bingo-grid {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr); /* 15 columnas */
+  gap: 10px;
+  width: 100%;
+}
+
+.bingo-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  font-size: 21px;
+  font-weight: bold;
+  text-align: center;
+  border: 3px solid #333;
+  color: #333;
+}
+
+@keyframes fadeBg {
+  from {
+    background-color: white;
+    color: #333;
+    border: 3px solid #333;
+  }
+  to {
+    background-color: oklch(57.7% 0.245 27.325); /* equivalente a Tailwind amber-600 */
+    color: white;
+    border: 3px solid white;
+  }
+}
+
+.fade-bg {
+  animation: fadeBg 0.3s ease-in-out forwards;
+}

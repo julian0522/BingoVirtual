@@ -1,19 +1,121 @@
-
-<section class="fixed bottom-0 top-0 w-full gap-8 bg-[url('/imagenes/Imagen_Bingo.webp')] bg-cover bg-center">
-
+<section
+  class="h-screen w-full gap-8 bg-[url('/imagenes/Imagen_Bingo.webp')] bg-cover bg-center"
+>
   <!-- Overlay semi-transparente -->
   <div class="absolute inset-0 bg-black opacity-75"></div>
 
-  <div class="relative grid-cols-1 max-w-screen-2xl mx-20 xl:mx-auto  mt-10 mb-10">
-    <div class="">
-      <h2 class="text-2xl mb-4 ">Modo de Juego Actual</h2>
-      <img [src]="`imagenes/${modoJuego()}.jpg`" alt="Imagen Modo De Juego Bingo" class="h-40 w-40 xl:h-50 xl:w-50">
+  <div class="relative flex flex-col items-center justify-start pt-6">
+    <h1 class="text-5xl text-white mb-8 z-10">Juego Bingo Virtual</h1>
+
+    @if (juegoReiniciado()) {
+    <div role="alert" class="alert alert-info z-10 mb-4">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="h-6 w-6 shrink-0 stroke-current"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      <span>El juego Ha sido reiniciado o se Inicio un nuevo Juego</span>
+    </div>
+    }
+
+    <!-- Grid de formularios e imagen -->
+    <div class="relative grid grid-cols-4 gap-10 z-10 items-start">
+      <!-- Formulario 1 -->
+      <form [formGroup]="bingoForm" (submit)="CambiarModoJuego()" class="w-80">
+        <fieldset class="fieldset mb-5">
+          <legend class="fieldset-legend text-xl">Modo de Juego</legend>
+          <select formControlName="modoJuego" class="select w-full">
+            <option disabled selected value="">Seleccione</option>
+            <option value="L">L</option>
+            <option value="O">O</option>
+            <option value="G">G</option>
+            <option value="T">T</option>
+            <option value="U">U</option>
+            <option value="C">C</option>
+            <option value="X">X</option>
+            <option value="Pleno">PLENO</option>
+          </select>
+          @if (isValidField(bingoForm, 'modoJuego')) {
+          <span class="form-text text-red-500 text-sm"
+            >El campo Modo de Juego es requerido</span
+          >
+          }
+        </fieldset>
+        <!-- <button
+          type="submit"
+          class="btn btn-primary border-2 rounded-2xl px-4 py-2 mt-4 mr-2"
+        >
+          Iniciar Juego
+        </button> -->
+        <button
+          (click)="CambiarModoJuego()"
+          type="submit"
+          class="btn btn-accent border-2 rounded-2xl px-4 py-2 mt-4"
+        >
+          Cambiar Modo de Juego
+        </button>
+      </form>
+
+      <!-- Formulario 2 -->
+      <form [formGroup]="bingoNumForm" (submit)="AgregarNumero()" class="w-80">
+        <fieldset class="fieldset mb-5">
+          <legend class="fieldset-legend text-xl">Número Bingo</legend>
+          <input
+            type="number"
+            formControlName="numero"
+            class="input w-full"
+            placeholder="Digite el Número"
+          />
+          @if (erroresAgregar() !== null) {
+          <span class="form-text text-red-500 text-sm">{{
+            erroresAgregar()
+          }}</span>
+          }
+        </fieldset>
+        <button type="submit" class="btn btn-primary border-2 rounded-2xl px-4 py-2 mt-4 mr-3">
+          Agregar Número
+        </button>
+
+        <!-- Botón de reiniciar -->
+        <button
+          class="mt-4 border-2 rounded-2xl px-6 py-2 bg-blue-600 text-white btn btn-primary"
+          (click)="reiniciarJuego()"
+        >
+          Reiniciar Juego
+        </button>
+      </form>
+
+      <!-- Imagen del modo de juego -->
+      <div class="text-white text-center">
+        <h2 class="text-2xl mb-4">Modo de Juego Actual</h2>
+        <img
+          [src]="`imagenes/${modoJuego()}.jpg`"
+          alt="Imagen Modo De Juego Bingo"
+          class="h-40 w-40 xl:h-50 xl:w-50 mx-auto rounded-lg shadow-md border"
+        />
+      </div>
+
+      <!-- Imagen de la empresa -->
+      <div class="text-white text-center">
+        <img
+          src="/imagenes/ImagenEmpresa.jpg"
+          alt="Imagen Modo De Juego Bingo"
+          class="h-40 w-40 xl:h-50 xl:w-50 mx-auto rounded-lg shadow-md border mt-11"
+        />
+      </div>
     </div>
   </div>
 
-  <div class="relative bingo-container max-w-screen-2xl mx-auto">
-
-    <!-- Columna con el texto BINGO -->
+  <!-- Panel del Bingo en parte inferior -->
+  <div class="relative bingo-container max-w-screen-2xl mx-auto z-10">
     <div class="bingo-line flex justify-center gap-4 mb-4">
       <span class="text-yellow-400 md:text-6xl font-bold my-2">B</span>
       <span class="text-yellow-400 md:text-6xl font-bold my-2">I</span>
@@ -22,22 +124,24 @@
       <span class="text-yellow-400 md:text-6xl font-bold my-2">O</span>
     </div>
 
-    <!-- Grilla de números del bingo -->
-    <div class="bingo-grid grid grid-cols-5 sm:grid-cols-10 md:grid-cols-15 gap-2 sm:gap-4">
+    <div
+      class="bingo-grid grid grid-cols-5 sm:grid-cols-10 md:grid-cols-15 gap-2 sm:gap-4"
+    >
       @for (numero of numerosBingo; track numero) {
-        <div
-          class="mb-4 bingo-item aspect-square flex items-center justify-center text-lg sm:text-xl md:text-4xl font-semibold rounded-md transition-all"
-          [ngClass]="{
-            'bg-red-600 text-white fade-bg': bingoService.numerosBingo().includes(numero),
-            'bg-white text-black border': !bingoService.numerosBingo().includes(numero)
-          }"
-        >
-          {{ numero }}
-        </div>
+      <div
+        class="mb-4 bingo-item aspect-square flex items-center justify-center text-lg sm:text-xl md:text-4xl font-semibold rounded-md transition-all"
+        [ngClass]="{
+          'bg-red-600 text-white fade-bg': bingoService
+            .numerosBingo()
+            .includes(numero),
+          'bg-white text-black border': !bingoService
+            .numerosBingo()
+            .includes(numero)
+        }"
+      >
+        {{ numero }}
+      </div>
       }
     </div>
-
   </div>
 </section>
-
-

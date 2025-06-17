@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { BingoService } from '../../services/bingo.service';
 import { CommonModule } from '@angular/common';
 import {
@@ -23,6 +23,7 @@ export class BingoPageComponent {
   numerosBingo: number[] = Array.from({ length: 75 }, (_, i) => i + 1);
 
   modoJuego = this.bingoService.modoJuego;
+  numeroActual = signal<number>(JSON.parse(localStorage.getItem("numeroActual") ?? "0"));
 
   //*----------- IMPLEMENTACION DE LOS FORMULARIOS PARA EL BINGO ----------------------------
   fb = inject(FormBuilder);
@@ -30,7 +31,7 @@ export class BingoPageComponent {
   juegoReiniciado = signal<boolean>(false);
 
   bingoForm = this.fb.group({
-    modoJuego: ['', Validators.required],
+    modoJuego: [this.modoJuego(), Validators.required],
   });
 
   bingoNumForm = this.fb.group({
@@ -66,16 +67,24 @@ export class BingoPageComponent {
   }
 
   AgregarNumero() {
+
+    if (this.modoJuego() === ''){
+      this.erroresAgregar.set("Para Iniciar con el Juego debe seleccionar el modo de juego Primero");
+      return;
+    }
+
     const result = this.bingoService.agregarNumero(
       this.bingoNumForm.get('numero')?.value ?? 0
     );
     this.erroresAgregar.set(result);
+    this.actualizarNumeroActual(this.bingoNumForm.get('numero')?.value ?? 0);
     this.bingoNumForm.reset({ numero: 0 });
   }
 
   reiniciarJuego() {
     this.bingoService.reiniciarJuego();
     this.juegoReiniciado.set(true);
+    this.actualizarNumeroActual(0);
 
     // Lo hacemos para que la alerta deje de mostrarse
     setTimeout(() => {
@@ -87,5 +96,10 @@ export class BingoPageComponent {
     return (
       !!form.controls[fieldName].errors && form.controls[fieldName].touched
     );
+  }
+
+  actualizarNumeroActual(numero: number){
+    this.numeroActual.set(numero);
+    localStorage.setItem("numeroActual", JSON.stringify(this.numeroActual()));
   }
 }

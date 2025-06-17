@@ -76,8 +76,8 @@ export class BingoPageComponent {
     const result = this.bingoService.agregarNumero(
       this.bingoNumForm.get('numero')?.value ?? 0
     );
+    if (!result) this.actualizarNumeroActual(this.bingoNumForm.get('numero')?.value ?? 0);
     this.erroresAgregar.set(result);
-    this.actualizarNumeroActual(this.bingoNumForm.get('numero')?.value ?? 0);
     this.bingoNumForm.reset({ numero: 0 });
   }
 

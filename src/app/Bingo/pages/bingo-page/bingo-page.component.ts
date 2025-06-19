@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { BingoService } from '../../services/bingo.service';
 import { CommonModule } from '@angular/common';
 import {
@@ -23,7 +23,28 @@ export class BingoPageComponent {
   numerosBingo: number[] = Array.from({ length: 75 }, (_, i) => i + 1);
 
   modoJuego = this.bingoService.modoJuego;
-  numeroActual = signal<number>(JSON.parse(localStorage.getItem("numeroActual") ?? "0"));
+  numeroActual = signal<number>(
+    JSON.parse(localStorage.getItem('numeroActual') ?? '0')
+  );
+  letraActual = computed(() => {
+    const numero = this.numeroActual();
+    if (!numero) return '';
+
+    switch (true) {
+      case numero <= 15:
+        return 'B';
+      case numero <= 30:
+        return 'I';
+      case numero <= 45:
+        return 'N';
+      case numero <= 60:
+        return 'G';
+      case numero <= 75:
+        return 'O';
+      default:
+        return '';
+    }
+  });
 
   //*----------- IMPLEMENTACION DE LOS FORMULARIOS PARA EL BINGO ----------------------------
   fb = inject(FormBuilder);
@@ -35,7 +56,7 @@ export class BingoPageComponent {
   });
 
   bingoNumForm = this.fb.group({
-    numero: [0, Validators.required],
+    numero: ['', [Validators.required, Validators.pattern('^[0-9]{1,2}$')]],
   });
 
   // IniciarJuego() {
@@ -67,18 +88,29 @@ export class BingoPageComponent {
   }
 
   AgregarNumero() {
-
-    if (this.modoJuego() === ''){
-      this.erroresAgregar.set("Para Iniciar con el Juego debe seleccionar el modo de juego Primero");
+    if (this.modoJuego() === '') {
+      this.erroresAgregar.set(
+        'Para Iniciar con el Juego debe seleccionar el modo de juego Primero'
+      );
       return;
     }
 
-    const result = this.bingoService.agregarNumero(
-      this.bingoNumForm.get('numero')?.value ?? 0
-    );
-    if (!result) this.actualizarNumeroActual(this.bingoNumForm.get('numero')?.value ?? 0);
+    if (!this.bingoNumForm.valid) {
+      this.erroresAgregar.set('En este campo solo se permiten numeros y no puede enviarse vacio');
+      this.bingoNumForm.reset({ numero: '' });
+      return;
+    }
+
+    // Se convierte el numero ingresado por el usuario a un tipo de dato numerico para enviarlo al servicio y actualizar la señal de numewro actual
+    const numeroIngresado = this.bingoNumForm.get('numero')?.value ?? '0';
+    const conversionNumero = parseInt(numeroIngresado, 10);
+    const result = this.bingoService.agregarNumero(conversionNumero);
+
+    if (!result) {
+      this.actualizarNumeroActual(conversionNumero);
+    }
     this.erroresAgregar.set(result);
-    this.bingoNumForm.reset({ numero: 0 });
+    this.bingoNumForm.reset({ numero: '' });
   }
 
   reiniciarJuego() {
@@ -98,8 +130,14 @@ export class BingoPageComponent {
     );
   }
 
-  actualizarNumeroActual(numero: number){
+  actualizarNumeroActual(numero: number) {
     this.numeroActual.set(numero);
-    localStorage.setItem("numeroActual", JSON.stringify(this.numeroActual()));
+    localStorage.setItem('numeroActual', JSON.stringify(this.numeroActual()));
+  }
+
+  eliminarNumero(numero: number) {
+    if (!this.bingoService.numerosBingo().includes(numero)) return;
+
+    this.bingoService.eliminarNumero(numero);
   }
 }

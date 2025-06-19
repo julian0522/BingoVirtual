@@ -70,10 +70,12 @@
         <fieldset class="fieldset mb-5">
           <legend class="fieldset-legend text-xl font-medium">Número Bingo</legend>
           <input
-            type="number"
+            type="text"
             formControlName="numero"
             class="input w-full"
             placeholder="Digite el Número"
+            pattern="[0-9]*"
+            maxlength="2"
           />
           <div class="form-text text-sm h-5 text-red-500">
             @if (erroresAgregar() !== null) {
@@ -103,9 +105,9 @@
       <div class="text-white text-center">
         <h2 class="text-2xl mb-4 font-medium">Numero Actual</h2>
         <div
-          class="h-40 w-50 xl:h-50 xl:w-50 mx-auto rounded-lg shadow-md border bg-white mt-5"
+          class="h-40 w-70 xl:h-50 xl:w-60 mx-auto rounded-lg shadow-md border bg-white mt-5"
         >
-          <p class="text-black text-9xl mt-6">{{ numeroActual() }}</p>
+          <p class="text-black text-9xl mt-6"><span class="text-amber-400 font-bold">{{ letraActual() }}</span>{{ numeroActual() }}</p>
         </div>
       </div>
 
@@ -145,7 +147,7 @@
     >
       @for (numero of numerosBingo; track numero) {
       <div
-        class="mb-4 bingo-item aspect-square flex items-center justify-center text-lg sm:text-xl md:text-4xl font-semibold rounded-md transition-all"
+        class="mb-4 bingo-item aspect-square flex items-center justify-center text-lg sm:text-xl md:text-4xl font-semibold rounded-md transition-all hover:-translate-y-2 ease-in-out cursor-pointer "
         [ngClass]="{
           'bg-red-600 text-white fade-bg': bingoService
             .numerosBingo()
@@ -154,6 +156,7 @@
             .numerosBingo()
             .includes(numero)
         }"
+        (click)="eliminarNumero(numero)"
       >
         {{ numero }}
       </div>

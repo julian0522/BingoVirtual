@@ -56,4 +56,10 @@ export class BingoService {
   reiniciarJuego() {
     this.numerosBingo.set([]);
   }
+
+  // Metodo para eliminar un numero que ya haya salido en el panel, por si se equivocaron en agregarlo
+  eliminarNumero(numero: number){
+    const listaNueva = this.numerosBingo().filter(x => x !== numero); // numero que se eleminara de la lista
+    this.numerosBingo.set(listaNueva); // Actualizamos la señal para que se guarde la nueva lista sin el numero a eliminar
+  }
 }
